@@ -1,4 +1,4 @@
-name: Component checks
+name: Plugin checks
 on:
   push:
   pull_request:
@@ -14,27 +14,23 @@ jobs:
         python: ["3.11", "3.13"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
         with:
           python-version: ${{ matrix.python }}
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
       - run: uv sync --frozen
-      - run: npm ci --prefix src/agentcore_runtime/cdk
-      - run: npm run check --prefix src/agentcore_runtime/cdk
-      - run: npm test --prefix src/agentcore_runtime/cdk
-      - run: uv run ruff check src
-      - run: uv run ruff format --check src
+      - run: uv run ruff check src/herdr_plugin scripts
+      - run: uv run ruff format --check src/herdr_plugin scripts
       - run: uv run pytest
+      - run: uv run python scripts/check_publication.py
       - run: uv run python src/herdr_plugin/tests/repository_privacy.py
-      - run: uv build --all-packages
-      - run: uv run python src/runtime_contract/tests/check_distributions.py --dist dist
+      - run: uv build --package herdr-agentcore
+      - run: uv run python src/herdr_plugin/tests/check_distributions.py --dist dist
+      - run: uv run python scripts/package_contract.py
       - name: Check production installation
         run: |
           uv sync --frozen --no-dev
           .venv/bin/python -m herdr_agentcore --help
-          .venv/bin/python -c "import importlib.util; assert importlib.util.find_spec('agentcore_runtime') is None"
+          .venv/bin/python -c "from herdr_agentcore.contract import decode_descriptor"

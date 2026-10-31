@@ -4,9 +4,9 @@ import json
 from unittest.mock import Mock
 
 import pytest
-from agentcore_contract import ConnectionSpec, UserError, encode_descriptor
 from conftest import ARN
 from herdr_agentcore.cli import exec_attach, main, setup_menu
+from herdr_agentcore.contract import ConnectionSpec, UserError, encode_descriptor
 from herdr_agentcore.storage import Profile
 
 
@@ -20,7 +20,6 @@ def test_import_preserves_runtime_command_but_selects_host_credentials_locally(t
                         "runtime_arn": ARN,
                         "command": ["/opt/assistant", "--project", "a b"],
                         "endpoint": "RELEASE",
-                        "agent_kind": "example-agent",
                     }
                 )
             )
@@ -38,6 +37,8 @@ def test_import_preserves_runtime_command_but_selects_host_credentials_locally(t
                 str(store.paths.config),
                 "--aws-profile",
                 "host-role",
+                "--agent-kind",
+                "example-agent",
             ]
         )
         == 0
@@ -200,7 +201,6 @@ def test_connector_command_override_is_saved_in_the_session_snapshot(tmp_path, s
                     {
                         "runtime_arn": ARN,
                         "command": ["/original/launcher"],
-                        "agent_kind": "opencode",
                     }
                 )
             )
@@ -230,9 +230,7 @@ def test_connector_command_override_is_saved_in_the_session_snapshot(tmp_path, s
 
 def test_import_standard_cdk_outputs(tmp_path, store):
     path = tmp_path / "cdk-outputs.json"
-    spec = ConnectionSpec.from_dict(
-        {"runtime_arn": ARN, "command": ["/declared/start"], "agent_kind": "example"}
-    )
+    spec = ConnectionSpec.from_dict({"runtime_arn": ARN, "command": ["/declared/start"]})
     path.write_text(
         json.dumps({"RuntimeStack": {"ConnectionDescriptor": json.dumps(encode_descriptor(spec))}})
     )
@@ -246,6 +244,8 @@ def test_import_standard_cdk_outputs(tmp_path, store):
                 "RuntimeStack",
                 "--profile",
                 "cdk",
+                "--agent-kind",
+                "example",
                 "--config-dir",
                 str(store.paths.config),
             ]

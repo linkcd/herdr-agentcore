@@ -11,9 +11,8 @@ import sys
 from dataclasses import asdict
 from pathlib import Path
 
-from agentcore_contract import decode_cdk_outputs, decode_descriptor
-
 from . import __version__, herdr
+from .contract import decode_cdk_outputs, decode_descriptor
 from .models import ConnectionRecord
 from .sessions import SessionService
 from .storage import Paths, Profile, Store, UserError

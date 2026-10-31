@@ -20,8 +20,8 @@ import uuid
 from dataclasses import asdict
 from pathlib import Path
 
-from agentcore_contract import decode_descriptor
 from herdr_agentcore.connector import AgentCoreTransport
+from herdr_agentcore.contract import decode_descriptor
 from herdr_agentcore.storage import Paths, Profile, Store, UserError
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -236,7 +236,9 @@ def run(
         spec = decode_descriptor(json.loads(connection_file.read_text()))
         if spec.runtime_arn != runtime_arn:
             raise UserError("The descriptor ARN does not match the requested test runtime.")
-        profile = Profile.from_dict({**asdict(spec), "aws_profile": aws_profile})
+        profile = Profile.from_dict(
+            {**asdict(spec), "aws_profile": aws_profile, "agent_kind": agent_kind}
+        )
     transport = AgentCoreTransport(profile)
     kind = profile.agent_kind
     if kind not in {"opencode", "codex"}:

@@ -1,7 +1,7 @@
 [project]
 name = "herdr-agentcore-workspace"
 version = "0.1.0"
-description = "Workspace for independent AgentCore runtimes, a Herdr connector, and their contract"
+description = "Herdr connector for independently deployed AgentCore terminal runtimes"
 requires-python = ">=3.11"
 dependencies = ["herdr-agentcore==0.1.0"]
 
@@ -9,18 +9,18 @@ dependencies = ["herdr-agentcore==0.1.0"]
 package = false
 
 [tool.uv.workspace]
-members = ["src/herdr_plugin", "src/runtime_contract"]
+members = ["src/herdr_plugin"]
 
 [tool.uv.sources]
 herdr-agentcore = { workspace = true }
 
 [dependency-groups]
-dev = ["pytest>=8.4,<10", "pytest-asyncio>=1,<2", "ruff>=0.12,<1"]
+dev = ["pytest>=8.4,<10", "pytest-asyncio>=1,<2", "ruff>=0.12,<1", "jsonschema>=4.23,<5"]
 
 [tool.pytest.ini_options]
-testpaths = ["src/runtime_contract/tests", "src/herdr_plugin/tests", "src/agentcore_runtime/tests"]
+testpaths = ["src/herdr_plugin/tests"]
 asyncio_mode = "auto"
-pythonpath = ["src"]
+pythonpath = ["src", "scripts"]
 
 [tool.ruff]
 target-version = "py311"

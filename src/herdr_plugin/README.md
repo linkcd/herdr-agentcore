@@ -2,156 +2,79 @@
 
 ## Purpose
 
-Connect Herdr terminals to provisioned AgentCore runtimes.
-The package is `herdr-agentcore`. Its Python module is `herdr_agentcore`.
-Its executable is `herdr-agentcore`.
+Connect Herdr to an already deployed AgentCore terminal runtime.
+The package is `herdr-agentcore`; its module is `herdr_agentcore`.
+It owns profiles, runtime-session and shell IDs, terminal transport, reconnect, detach, and stop.
 
-The connector owns profiles, session/shell IDs, terminal transport, reconnect, detach, and stop.
-It does not build images, provision infrastructure, choose models, or install assistant skills.
-It depends on the shared contract and AgentCore client libraries, not the runtime-definition package.
-Named runtime settings such as `opencode-agentcore-profile-2` are references supplied by the runtime owner.
-The connector stores that reference and uses the explicit command and Herdr hint. It does not contain an assistant-name enum.
+Runtime images and infrastructure are maintained in the separate `agentcore-coding-runtimes` repository.
+This package has no dependency on that repository or an external contract implementation package.
+Its production dependencies are the AgentCore SDK and WebSocket client.
 
-## Configure a runtime
+## Configure
 
-Follow the [step-by-step existing-runtime guide](../../docs/CONNECT_EXISTING_RUNTIME.md) for authentication, launch checks, and troubleshooting.
+Installed users run `herdr plugin action invoke agentcore.setup` from a Herdr workspace.
+Herdr supplies the installed root and external config/state directories automatically.
 
-Run from the repository root. Use macOS or Linux, Python 3.11+, uv, and Herdr 0.9.5+.
-
-1. Install the connector and its dependencies:
-
-   ```bash
-   uv sync --frozen --no-dev
-   ```
-
-2. Link the plugin:
-
-   ```bash
-   herdr plugin link "$PWD"
-   ```
-
-3. Import the current OpenCode CDK outputs:
-
-   ```bash
-   .venv/bin/herdr-agentcore configure \
-     --cdk-outputs .local/deployments/opencode-agentcore-profile-2.json \
-     --stack HerdrOpenCodeRuntime \
-     --profile opencode-agentcore-profile-2 \
-     --config-dir "$(herdr plugin config-dir agentcore)"
-   ```
-
-4. Select the default profile:
-
-   ```bash
-   .venv/bin/herdr-agentcore set-default opencode-agentcore-profile-2 \
-     --config-dir "$(herdr plugin config-dir agentcore)"
-   ```
-
-5. Open the agent:
-
-   ```bash
-   herdr plugin action invoke agentcore.new
-   ```
-
-Alternatively, register a deployed ARN directly:
+For a local source checkout, run from the repository root:
 
 ```bash
+uv sync --frozen --no-dev
+herdr plugin link "$PWD"
 .venv/bin/herdr-agentcore configure \
-  --runtime-arn "$RUNTIME_ARN" --agent-kind opencode \
-  --runtime-profile opencode-agentcore-profile-2 \
-  --profile opencode-agentcore-profile-2 \
-  --config-dir "$(herdr plugin config-dir agentcore)" \
-  --command /app/run.sh
+  --connection-file /path/to/connection.json \
+  --profile my-agent \
+  --agent-kind opencode \
+  --config-dir "$(herdr plugin config-dir agentcore)"
 ```
 
-`--command` consumes the remaining arguments. Put it last.
-It is required with `--runtime-arn` or the sample ARN import. The connector has no default launcher.
-The interactive setup menu also requires explicit JSON argv.
-Use `--aws-profile` for host-local credential selection. Omit it to use the normal AWS provider chain.
-Deployment credentials do not arrive through the descriptor.
-Add `--replace` only when replacing an existing profile.
+The runtime descriptor supplies an ARN, explicit launch command, and optional endpoint.
+The plugin derives the AWS region from the ARN.
+`--agent-kind` selects only a local Herdr recognition hint. Omit it for an ordinary terminal.
+Use `--aws-profile` only for a named host credential profile. Otherwise, use the normal AWS credential chain.
 
-Direct ARN registration without `--agent-kind` creates an ordinary terminal profile.
-Descriptor import uses its declared hint. `--agent-kind terminal` explicitly clears a hint.
-The hint does not install Herdr support for a new assistant. Herdr must already recognize that kind.
+Use `--cdk-outputs PATH --stack NAME` to import a CDK output document.
+Use `--runtime-arn ARN --command EXECUTABLE ARGUMENTS...` for direct registration.
+Put `--command` last. Commands have no inferred default.
+An explicit `--command` can override a valid imported descriptor's command.
 
-For an owner-supplied standalone descriptor, replace `--cdk-outputs PATH --stack STACK_NAME` with `--connection-file PATH`.
-CDK does not create a separate `.connection.json` file.
-The runtime profile reference, Herdr recognition hint, local connection profile label, and AWS credential profile are separate settings.
-
-The current deployment outputs are:
-
-| Provision profile and suggested connection label | File under `.local/deployments/` | Stack |
-| --- | --- | --- |
-| `codex-agentcore-profile-1` | `codex-agentcore-profile-1.json` | `HerdrCodexRuntime` |
-| `opencode-agentcore-profile-2` | `opencode-agentcore-profile-2.json` | `HerdrOpenCodeRuntime` |
-| `opencode-s3filesystem-agentcore-profile-3` | `opencode-s3filesystem-agentcore-profile-3.json` | `HerdrOpenCodeS3FilesystemRuntime` |
-
-Use the same configure command with the selected row's file, stack, and profile.
-Deployment does not update saved Herdr profiles automatically. Import successful outputs before starting a new deployment's sessions.
-
-## Profiles and session operations
-
-Selection order: explicit `--profile`, then `HERDR_AGENTCORE_PROFILE`, then saved `default_profile`.
-The first saved profile becomes default. Later saves preserve it.
-An invalid override fails instead of selecting another runtime.
+## Connection operations
 
 ```bash
-.venv/bin/herdr-agentcore action new --profile opencode-agentcore-profile-2
+.venv/bin/herdr-agentcore action new --profile my-agent
 herdr plugin action invoke agentcore.attach
 herdr plugin action invoke agentcore.sessions
 herdr plugin action invoke agentcore.stop
 ```
 
+Selection order is explicit profile, `HERDR_AGENTCORE_PROFILE`, then saved default.
+The first profile becomes default; later imports preserve that choice.
 Detach with Ctrl+] followed by `d`.
-Attachment reuses the original runtime-session and shell IDs. It does not launch a second assistant.
-Stop targets the whole runtime session, not one shell. It requires confirmation and a local lock.
-The local `stopped` label means the request was accepted; no completion waiter exists.
+Reattachment uses the original runtime-session and shell IDs and does not launch another assistant.
+Stop requires confirmation and targets the whole runtime session.
 
-Profiles and connection records remain in Herdr's external config/state directories.
-Existing profile snapshots keep their recorded target, command, and recognition hint.
-Damaged records are reported without deleting them or hiding healthy records.
-Adding the numbered profiles preserves an older saved default. Use an explicit launch profile or select a verified current default.
+Saved configuration and connection records stay in Herdr's external config/state directories.
+When invoking the executable outside a plugin-managed pane, supply `--config-dir` and `--state-dir` for the intended Herdr installation.
+Local statuses are records of previous observations, not a live inventory of AWS compute.
 
-## Latest verification — 2026-10-19
+## Contract ownership
 
-The launcher image update reached Runtime/DEFAULT version 2 and READY on all three profiles. ARNs and the `/app/run.sh` connection command stayed unchanged.
-Fresh isolated model, role, detach/attachment, follow-up, shell-tool, and stop flows passed on the updated images.
-After the model-only profile rebuild, all three numbered descriptors were replaced with new runtime ARNs. Two independent sessions per profile opened in three replacement tabs.
-All six passed native recognition and returned real date and folder-access results.
-The user-requested sessions were left open. They are not disposable probe sessions; check live state before any later operation.
-All three deployments passed isolated detach/attachment, context-preserving follow-up, runtime-role, and shell-tool probes.
-Those probes stopped their own sessions and servers. See the [runtime results](../agentcore_runtime/README.md#current-validation) for versions, test scope, and model-history limits.
+The [versioned JSON contract](../../contracts/v1/README.md) is the boundary with runtime publishers.
+`herdr_agentcore.contract` validates imported descriptors using standard-library code.
+`models.Profile` adds local recognition and host-credential settings.
+Its optional `runtime_profile` source label describes the local connection and is not accepted in runtime exports.
 
-## Format and command ownership
-
-- Profiles and descriptors are unreleased formats. Their internal version fields do not establish a public compatibility contract.
-- Every profile requires explicit `command`. A missing `agent_kind` always means an ordinary terminal.
-- The connector executes declared argv. It does not infer an assistant type from an ARN, executable name, or file path.
-- Wrapped launch commands work without importing runtime implementation code.
-- `--runtime-config` imports an external sample's ARN only. Supply `--command` and any recognition hint explicitly.
-- Runtime infrastructure uses official AWS CDK commands in `src/agentcore_runtime/`.
-- Import its `ConnectionDescriptor` through `--cdk-outputs`, or use an owner-supplied descriptor/explicit ARN.
-- Runtime-specific credential or launcher repairs belong to the image owner, not the connector.
-
-To replace a valid descriptor's command, add `--command` and the complete replacement argv last during configuration.
-The command must already exist in the selected runtime. Registration does not install it.
+The connector has no assistant-name enum. Recognition requires support in Herdr; it does not affect the generic Shell transport.
+Publishers do not need to import this package to produce a descriptor.
 
 ## Checks
 
-The repository root owns `LICENSE` and `NOTICE`. Hatch bundles them into source distributions and wheel metadata without component-local source copies.
-
-Run from the repository root:
-
 ```bash
-uv sync --frozen
-HERDR_TEST_BINARY="$(command -v herdr)" \
-  uv run --frozen pytest src/herdr_plugin/tests -q --tb=short
+uv run --frozen pytest src/herdr_plugin/tests -q --tb=short
 uv build --package herdr-agentcore
 ```
 
-The optional Herdr test uses an isolated registry. Default tests make no AWS calls.
-Live probes in `tests/` require explicit authorization and a selected runtime.
+Default tests make no AWS calls. Set `HERDR_TEST_BINARY` to include isolated Herdr installation checks.
+Live probes require an explicitly authorized target and stop only their own disposable sessions.
+The root LICENSE and NOTICE are included in package distributions.
 
-Repository links: [runtime definitions](../agentcore_runtime/README.md), [connection contract](../runtime_contract/README.md), and [writing rules](../../agent.md#documentation-style-asd-ste100-style-english).
-These relative links refer to a full repository checkout.
+See the [connection guide](../../docs/CONNECT_EXISTING_RUNTIME.md), [design](../../docs/DESIGN.md), and [repository instructions](../../agent.md).

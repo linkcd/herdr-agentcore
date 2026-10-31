@@ -8,9 +8,9 @@ from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from enum import StrEnum
 
-from agentcore_contract import ConnectionSpec
-from agentcore_contract import UserError as UserError
-from agentcore_contract import plain_text as plain_text
+from .contract import ConnectionSpec
+from .contract import UserError as UserError
+from .contract import plain_text as plain_text
 
 
 def timestamp() -> str:
@@ -33,21 +33,52 @@ def connection_id(value: str) -> str:
 
 
 @dataclass(frozen=True)
-class Profile(ConnectionSpec):
-    """A connection specification plus host-local AWS credential selection."""
+class Profile:
+    """Local settings, independent of the publisher's descriptor.
 
+    runtime_profile is an optional descriptive source label, not a runtime
+    requirement or an assistant selector.
+    """
+
+    runtime_arn: str
+    region: str
+    command: list[str]
+    endpoint: str = "DEFAULT"
+    agent_kind: str | None = None
+    runtime_profile: str | None = None
     aws_profile: str | None = None
 
     @classmethod
     def from_dict(cls, data: dict) -> Profile:
         if not isinstance(data, dict):
             raise UserError("A runtime profile must be a JSON object.")
-        connection = {key: value for key, value in data.items() if key != "aws_profile"}
+        if set(data) - set(cls.__dataclass_fields__):
+            raise UserError("Unknown local connection profile fields.")
+        connection = {
+            key: value
+            for key, value in data.items()
+            if key in {"runtime_arn", "command", "endpoint"}
+        }
         spec = ConnectionSpec.from_dict(connection)
+        if (data.get("region") or spec.region) != spec.region:
+            raise UserError("Connection region must match the runtime ARN's region.")
+        kind = data.get("agent_kind")
+        reference = data.get("runtime_profile")
+        for value, label in ((kind, "agent_kind"), (reference, "runtime_profile")):
+            if value is not None and (
+                not isinstance(value, str) or not re.fullmatch(r"[a-z][a-z0-9_-]{0,63}", value)
+            ):
+                raise UserError(f"{label} must be null or a lowercase identifier.")
         aws_profile = data.get("aws_profile")
         if aws_profile is not None:
             plain_text(aws_profile, "AWS profile")
-        return cls(**asdict(spec), aws_profile=aws_profile)
+        return cls(
+            **asdict(spec),
+            region=spec.region,
+            agent_kind=kind,
+            runtime_profile=reference,
+            aws_profile=aws_profile,
+        )
 
 
 class LaunchState(StrEnum):

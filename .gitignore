@@ -45,3 +45,12 @@ credentials.json
 /state/
 /test-artifacts/
 .local/
+.omni/
+.claude/
+.github/
+.cursor/
+.kiro/
+.agents/
+.env.omni
+.omni/collector.json
+.mcp.json
