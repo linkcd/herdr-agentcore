@@ -29,4 +29,4 @@ Image builds, AWS deployment, storage administration, model selection, and appli
 | P03 | Live probes use explicitly authorized targets and clean up only their own sessions. |
 
 The descriptor and local saved-profile formats are separate.
-See [the contract](../contracts/v1/README.md) and [the design](DESIGN.md).
+See [the contract](../contracts/1.0.0/README.md) and [the design](DESIGN.md).

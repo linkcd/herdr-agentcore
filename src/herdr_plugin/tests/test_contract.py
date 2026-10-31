@@ -105,7 +105,7 @@ def test_invalid_cdk_outputs_fail_without_guessing(outputs, stack):
         decode_cdk_outputs(outputs, stack)
 
 
-CONTRACT = Path(__file__).resolve().parents[3] / "contracts/v1"
+CONTRACT = Path(__file__).resolve().parents[3] / "contracts" / CONTRACT_VERSION
 CASES = json.loads((CONTRACT / "fixtures.json").read_text())
 SCHEMA = Draft202012Validator(json.loads((CONTRACT / "connection.schema.json").read_text()))
 
@@ -135,3 +135,4 @@ def test_aggregate_argv_limit_counts_utf8_and_separators():
 def test_schema_is_valid():
     Draft202012Validator.check_schema(SCHEMA.schema)
     assert SCHEMA.schema["properties"]["version"]["default"] == CONTRACT_VERSION
+    assert SCHEMA.schema["$id"] == f"urn:herdr-agentcore:connection:{CONTRACT_VERSION}"

@@ -4,14 +4,15 @@ Connect Herdr terminals to interactive assistants hosted in Amazon Bedrock Agent
 The plugin manages terminal transport, saved connections, reconnect, detach, and stop.
 It does not build images or deploy AWS resources.
 
-Runtime images and CDK infrastructure are maintained independently in the `agentcore-coding-runtimes` repository.
+Source repository: [linkcd/herdr-agentcore](https://github.com/linkcd/herdr-agentcore).
+Runtime images and CDK infrastructure are maintained independently in [linkcd/agentcore-coding-assistant](https://github.com/linkcd/agentcore-coding-assistant).
 
 ## Repository layout
 
 ```text
 herdr-plugin.toml                 Herdr actions and pane entrypoints
 src/herdr_plugin/                Python connector package and tests
-contracts/v1/                    Canonical JSON schema and conformance cases
+contracts/1.0.0/                 Canonical JSON schema and conformance cases
 scripts/package_contract.py      Contract release-artifact builder
 docs/                            Connector design and operation guides
 ```
@@ -23,10 +24,10 @@ The management host needs AWS permission to invoke the selected runtime's Shell 
 The runtime must contain a working interactive launch command.
 Installation downloads locked Python dependencies. Herdr does not install system toolchains.
 
-Replace `OWNER/REPO` with the public repository that hosts this plugin:
+Once the plugin source is published on the repository's default branch, install it with:
 
 ```bash
-herdr plugin install OWNER/REPO
+herdr plugin install linkcd/herdr-agentcore
 herdr plugin action invoke agentcore.setup
 herdr plugin action invoke agentcore.new
 ```
@@ -126,8 +127,9 @@ They can also provide an endpoint qualifier. The descriptor envelope identifies 
 
 The example identifiers are fictional.
 Recognition hints, local profile labels, host credentials, and execution IDs are not exported by runtimes.
-The plugin owns [the contract specification](contracts/v1/README.md) and its internal validator.
+The plugin owns [the contract specification](contracts/1.0.0/README.md) and its internal validator.
 Runtime publishers consume pinned schema/fixture artifacts, not plugin source code.
+Contract releases use full SemVer directories and archive prefixes, such as `contracts/1.0.0/` and `1.0.0/`.
 
 ## Build and verify
 

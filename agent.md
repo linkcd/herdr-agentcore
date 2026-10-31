@@ -2,17 +2,18 @@
 
 ## Read first
 
-Read [README.md](README.md), [the connector README](src/herdr_plugin/README.md), [the connection contract](contracts/v1/README.md), and [the design](docs/DESIGN.md).
+Read [README.md](README.md), [the connector README](src/herdr_plugin/README.md), [the connection contract](contracts/1.0.0/README.md), and [the design](docs/DESIGN.md).
 Use [the connection guide](docs/CONNECT_EXISTING_RUNTIME.md) before changing launch or recovery behavior.
 
 ## Scope and repository boundaries
 
 This repository contains the Herdr AgentCore plugin.
-Runtime images, CDK infrastructure, provision profiles, storage, and runtime verification are maintained in the separate `agentcore-coding-runtimes` repository.
+The source repository is [linkcd/herdr-agentcore](https://github.com/linkcd/herdr-agentcore).
+Runtime images, CDK infrastructure, provision profiles, storage, and runtime verification belong to [linkcd/agentcore-coding-assistant](https://github.com/linkcd/agentcore-coding-assistant).
 
 1. Keep the plugin package and tests under `src/herdr_plugin/`.
 2. Keep the Herdr manifest, Python workspace, lockfile, LICENSE, and NOTICE at the root.
-3. The plugin owns the specification and fixtures under `contracts/v1/`.
+3. The plugin owns the specification and fixtures under `contracts/1.0.0/`. Use full SemVer names for contract directories and archive prefixes.
 4. Keep the Python contract validator internal to `herdr_agentcore`. Do not add a shared implementation-package dependency.
 5. The runtime publisher implements the JSON format independently. No build may require its checkout beside this repository.
 6. Required runtime information is the ARN and explicit launch argv. The endpoint is optional and defaults to `DEFAULT`; derive the region from the ARN.

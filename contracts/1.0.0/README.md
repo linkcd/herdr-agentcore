@@ -2,7 +2,7 @@
 
 ## Ownership and scope
 
-The Herdr AgentCore plugin repository owns this specification, schema, and fixtures.
+The [Herdr AgentCore plugin](https://github.com/linkcd/herdr-agentcore) owns this specification, schema, and fixtures.
 Runtime publishers implement the data format. They do not import plugin code.
 The Python validator is an internal plugin module, `herdr_agentcore.contract`.
 It is not a separately published package.
@@ -66,7 +66,8 @@ If the document contains multiple stacks, the caller must select a stack explici
 The contract uses SemVer independently of the Herdr plugin's manifest version.
 Consumers accept stable `1.x.y` versions with the documented payload shape. Build metadata is permitted and does not affect compatibility.
 Prereleases, other major versions, numeric versions, and incomplete version strings are rejected.
-The `v1/` directory groups contract major version 1.
+The `contracts/1.0.0/` directory identifies this exact contract release.
+Keep each published release in its own `contracts/MAJOR.MINOR.PATCH/` directory.
 The `agentcore-shell-v1` transport identifies the Shell protocol independently of descriptor SemVer.
 
 - **Major:** incompatible fields, validation rules, or transport behavior. Because unknown fields are rejected, adding a wire field requires a major version unless consumers can already accept it.
@@ -80,7 +81,8 @@ Local profile and connection-record format markers are internal storage versions
 [connection.schema.json](connection.schema.json) defines structure and field constraints.
 [fixtures.json](fixtures.json) contains shared valid and invalid cases.
 Publish both files with a tagged plugin release. Consumers pin the release and file checksums.
-The release artifact is named `connection-contract-1.0.0.zip` and declares `descriptor_version: "1.0.0"` in its checksum manifest.
+The release artifact is named `connection-contract-1.0.0.zip` and contains a `1.0.0/` directory.
+Its `1.0.0/checksums.json` manifest declares `descriptor_version: "1.0.0"` and hashes every artifact file.
 Normal builds use the checked-in pinned copies and do not fetch a moving branch.
 Both implementations must pass the fixtures and aggregate command-size checks.
 

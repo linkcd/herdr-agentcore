@@ -6,6 +6,8 @@ import sys
 import tomllib
 from pathlib import Path
 
+from herdr_agentcore.contract import CONTRACT_VERSION
+
 ROOT = Path(__file__).resolve().parents[3]
 PACKAGE = ROOT / "src/herdr_plugin/herdr_agentcore"
 
@@ -27,7 +29,7 @@ def test_plugin_is_the_only_workspace_package():
         re.split(r"[<>=!~\[]", value)[0] for value in package["project"]["dependencies"]
     }
     assert dependencies == {"bedrock-agentcore", "websockets"}
-    assert (ROOT / "contracts/v1/connection.schema.json").is_file()
+    assert (ROOT / "contracts" / CONTRACT_VERSION / "connection.schema.json").is_file()
 
 
 def test_plugin_imports_only_local_modules_and_supported_dependencies():

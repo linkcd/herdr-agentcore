@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def package_contract(output: Path) -> None:
-    source = ROOT / "contracts/v1"
+    source = ROOT / "contracts" / CONTRACT_VERSION
     files = {
         name: (source / name).read_bytes()
         for name in ("connection.schema.json", "fixtures.json", "README.md")
@@ -25,8 +25,10 @@ def package_contract(output: Path) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for name, content in files.items():
-            archive.writestr("v1/" + name, content)
-        archive.writestr("v1/checksums.json", json.dumps(manifest, indent=2) + "\n")
+            archive.writestr(f"{CONTRACT_VERSION}/{name}", content)
+        archive.writestr(
+            f"{CONTRACT_VERSION}/checksums.json", json.dumps(manifest, indent=2) + "\n"
+        )
     print(f"Built contract artifact: {output}")
 
 

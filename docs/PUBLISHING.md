@@ -3,6 +3,7 @@
 ## Requirements
 
 Follow [Herdr's plugin contract](https://herdr.dev/tui/docs/plugins/) and [marketplace rules](https://herdr.dev/tui/docs/marketplace/).
+The source repository is [linkcd/herdr-agentcore](https://github.com/linkcd/herdr-agentcore).
 
 The source repository must:
 
@@ -41,9 +42,10 @@ Use SemVer independently for the plugin and connection contract:
 | Minimum Herdr | `0.9.5` | Manifest compatibility requirement |
 
 Use plugin release tags such as `v0.1.0`. The marketplace displays the manifest version from the default branch.
-The contract artifact is `connection-contract-1.0.0.zip`; its internal `v1/` directory identifies the protocol major version.
+Contract source files live in `contracts/1.0.0/`.
+The contract artifact is `connection-contract-1.0.0.zip`; its internal `1.0.0/` directory identifies the exact contract release.
 Changing the contract version does not require matching the plugin version number.
-See [contract compatibility](../contracts/v1/README.md#semver-compatibility) before changing the interface.
+See [contract compatibility](../contracts/1.0.0/README.md#semver-compatibility) before changing the interface.
 
 ## Validate source before publishing
 
@@ -67,7 +69,7 @@ They do not contact a public fixture repository, alter the user's plugin install
 
 ## Publish and discover
 
-1. Choose the GitHub owner and repository name.
+1. Confirm that `origin` targets `https://github.com/linkcd/herdr-agentcore.git` and complete any required publication approvals.
 2. Review and commit the source, manifest, documentation, and lockfile.
 3. Publish the repository's default branch. Verify that its root contains `herdr-plugin.toml`.
 4. Add a repository description and the topic `herdr-plugin`.
@@ -75,7 +77,7 @@ They do not contact a public fixture repository, alter the user's plugin install
 6. Verify the published repository with:
 
    ```bash
-   uv run --frozen python scripts/check_publication.py --github OWNER/REPO
+   uv run --frozen python scripts/check_publication.py --github linkcd/herdr-agentcore
    ```
 
 The GitHub check is read-only. It checks visibility, fork/archive status, the topic, and default-branch manifest metadata.
@@ -84,9 +86,9 @@ It does not make a repository public, push code, create a release, or change top
 An owner can add the topic with GitHub's repository settings or:
 
 ```bash
-gh repo edit OWNER/REPO --add-topic herdr-plugin
+gh repo edit linkcd/herdr-agentcore --add-topic herdr-plugin
 ```
 
-Users install the published source with `herdr plugin install OWNER/REPO`.
+Users install the published source with `herdr plugin install linkcd/herdr-agentcore`.
 Use `--ref TAG_OR_COMMIT` when validating a particular published revision.
 Check the [marketplace](https://herdr.dev/plugins/) after its refresh cycle.

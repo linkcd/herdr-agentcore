@@ -6,7 +6,7 @@ Connect Herdr to an already deployed AgentCore terminal runtime.
 The package is `herdr-agentcore`; its module is `herdr_agentcore`.
 It owns profiles, runtime-session and shell IDs, terminal transport, reconnect, detach, and stop.
 
-Runtime images and infrastructure are maintained in the separate `agentcore-coding-runtimes` repository.
+Runtime images and infrastructure are maintained in [linkcd/agentcore-coding-assistant](https://github.com/linkcd/agentcore-coding-assistant).
 This package has no dependency on that repository or an external contract implementation package.
 Its production dependencies are the AgentCore SDK and WebSocket client.
 
@@ -58,7 +58,7 @@ Local statuses are records of previous observations, not a live inventory of AWS
 
 ## Contract ownership
 
-The [versioned JSON contract](../../contracts/v1/README.md) is the boundary with runtime publishers.
+The [versioned JSON contract](../../contracts/1.0.0/README.md) is the boundary with runtime publishers.
 `herdr_agentcore.contract` validates imported descriptors using standard-library code.
 `models.Profile` adds local recognition and host-credential settings.
 Its optional `runtime_profile` source label describes the local connection and is not accepted in runtime exports.

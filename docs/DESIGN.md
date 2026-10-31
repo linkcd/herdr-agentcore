@@ -15,7 +15,7 @@ The independent runtime repository owns application images, deployment, storage,
 
 ## Minimal deployment boundary
 
-The runtime publishes a [versioned JSON descriptor](../contracts/v1/README.md).
+The runtime publishes a [versioned JSON descriptor](../contracts/1.0.0/README.md).
 Required connection values are runtime ARN and explicit launch argv. The endpoint defaults to `DEFAULT`.
 The consumer derives region from the ARN. Format markers are constants, not deployment choices.
 

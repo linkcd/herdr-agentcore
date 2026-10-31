@@ -15,7 +15,7 @@ The current repository contains only the plugin implementation and its versioned
 | Public APIs | [herdr.py](../src/herdr_plugin/herdr_agentcore/herdr.py) uses the public CLI and injected `HERDR_BIN_PATH`. |
 | Invocation context | Pane creation uses explicit pane/workspace context. |
 | External user state | Profiles and records use Herdr's config/state directories and local locks. |
-| Owned schema | [models.py](../src/herdr_plugin/herdr_agentcore/models.py) validates local records; [the contract](../contracts/v1/README.md) defines runtime exports. |
+| Owned schema | [models.py](../src/herdr_plugin/herdr_agentcore/models.py) validates local records; [the contract](../contracts/1.0.0/README.md) defines runtime exports. |
 | Build isolation | `uv sync --frozen --no-dev` installs only the connector and its dependencies. |
 | Long-running work | Connectors run in panes and restore terminal state on exit. |
 | Agent recognition | A local optional hint sets `HERDR_AGENT`. The connector does not contain an assistant enum. |
@@ -37,7 +37,7 @@ See [the design](DESIGN.md) for transport and recovery boundaries.
 The connector builds one Python wheel and source distribution.
 Root LICENSE and NOTICE files are included in both.
 The contract schema and fixtures are packaged as a separate data artifact, not a shared code package.
-Runtime deployment and image builds are maintained in `agentcore-coding-runtimes`.
+Runtime deployment and image builds are maintained in [linkcd/agentcore-coding-assistant](https://github.com/linkcd/agentcore-coding-assistant).
 
 ```bash
 HERDR_TEST_BINARY="$(command -v herdr)" uv run --frozen pytest \
@@ -52,5 +52,5 @@ The optional manifest test uses an isolated, disabled plugin registry.
 It does not modify the user's registry or start a remote agent.
 Source-build tests validate the declared build command without runtime context.
 The optional managed installer test exercises installation and update with local Git transport and an isolated registry.
-Public repository discovery is checked separately with `scripts/check_publication.py --github OWNER/REPO`.
+Public repository discovery is checked with `scripts/check_publication.py --github linkcd/herdr-agentcore`.
 Remote publication and marketplace registration require an explicit request.

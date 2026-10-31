@@ -14,7 +14,7 @@ Laptop viewer -> persistent Herdr management host -> AgentCore workers
 
 The management host owns Herdr state, local profiles, and connector processes.
 Workers own application processes and use runtime-configured storage.
-The runtime implementation is maintained in `agentcore-coding-runtimes`.
+The runtime implementation is maintained in [linkcd/agentcore-coding-assistant](https://github.com/linkcd/agentcore-coding-assistant).
 
 ## Recovery boundaries
 

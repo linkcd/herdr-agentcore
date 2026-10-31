@@ -20,10 +20,10 @@ Runtime model credentials, configuration, storage, and work-health reporting bel
 Use macOS or Linux, Git, Python 3.11+, uv, and Herdr 0.9.5+.
 For a remote Herdr server, install the plugin on that server's host.
 
-For a published plugin, replace `OWNER/REPO` with its GitHub repository:
+For a published revision of [linkcd/herdr-agentcore](https://github.com/linkcd/herdr-agentcore), run:
 
 ```bash
-herdr plugin install OWNER/REPO
+herdr plugin install linkcd/herdr-agentcore
 herdr plugin action invoke agentcore.setup
 ```
 
@@ -55,7 +55,7 @@ The direct CLI examples below assume a source checkout. Managed-install users ca
 
 For a CDK output file, replace `--connection-file PATH` with `--cdk-outputs PATH --stack NAME`.
 The selected stack must contain a JSON string output named `ConnectionDescriptor`.
-See [the descriptor specification](../contracts/v1/README.md).
+See [the descriptor specification](../contracts/1.0.0/README.md).
 
 `--agent-kind` is a local recognition hint, not a runtime setting or model selector.
 Omit it for an ordinary terminal, or use `--agent-kind terminal` to clear it explicitly.
