@@ -187,6 +187,22 @@ def test_setup_offers_the_sample_launcher_when_the_command_is_blank(monkeypatch,
     assert store.profiles()["new"].command == ["/app/run.sh"]
 
 
+def test_setup_defaults_the_agent_kind_to_opencode(monkeypatch, store):
+    responses = iter(["new", ARN, "", "", "", "", ""])
+    monkeypatch.setattr("builtins.input", lambda _: next(responses))
+    setup_menu(store)
+    assert store.profiles()["new"].agent_kind == "opencode"
+
+
+def test_setup_accepts_another_agent_kind_or_an_ordinary_terminal(monkeypatch, store):
+    responses = iter(["a", ARN, "", "", "codex", "", "", "b", ARN, "", "", "terminal", "", ""])
+    monkeypatch.setattr("builtins.input", lambda _: next(responses))
+    setup_menu(store)
+    setup_menu(store)
+    assert store.profiles()["a"].agent_kind == "codex"
+    assert store.profiles()["b"].agent_kind is None
+
+
 def test_setup_keeps_an_explicit_command(monkeypatch, store):
     responses = iter(["new", ARN, "", "", "opencode", '["/opt/agent", "--tui"]', ""])
     monkeypatch.setattr("builtins.input", lambda _: next(responses))

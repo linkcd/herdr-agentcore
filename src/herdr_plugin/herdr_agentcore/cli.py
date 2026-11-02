@@ -94,8 +94,10 @@ def choose(items: list, label, prompt: str):
 
 
 # Offered only by interactive setup, for the sample runtime images.
-# The saved profile always holds the argv.
+# The saved profile always holds the argv. The agent kind is a local Herdr recognition hint;
+# "terminal" clears it, as with "configure --agent-kind terminal".
 SETUP_DEFAULT_COMMAND = '["/app/run.sh"]'
+SETUP_DEFAULT_AGENT_KIND = "opencode"
 
 
 def setup_menu(store: Store):
@@ -104,9 +106,14 @@ def setup_menu(store: Store):
     arn = input("Runtime ARN: ").strip()
     aws_profile = input("AWS profile (blank for default credential chain): ").strip() or None
     endpoint = input("Runtime endpoint [DEFAULT]: ").strip() or "DEFAULT"
-    kind = input("Herdr agent kind (blank for an ordinary terminal): ").strip() or None
-    answer = input(f"Launch argv as JSON [{SETUP_DEFAULT_COMMAND}]: ").strip()
-    command = answer or SETUP_DEFAULT_COMMAND
+    answer = input(
+        f"Herdr agent kind [{SETUP_DEFAULT_AGENT_KIND}] "
+        "(other: codex, or 'terminal' for an ordinary terminal): "
+    ).strip()
+    kind = answer or SETUP_DEFAULT_AGENT_KIND
+    kind = None if kind == "terminal" else kind
+    command_answer = input(f"Launch argv as JSON [{SETUP_DEFAULT_COMMAND}]: ").strip()
+    command = command_answer or SETUP_DEFAULT_COMMAND
     profile = Profile.from_dict(
         {
             "runtime_arn": arn,
