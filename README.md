@@ -30,8 +30,9 @@ That role needs these permissions on your runtime ARN:
 Grant them on the runtime ARN and on `RUNTIME_ARN/runtime-endpoint/DEFAULT` (use your endpoint name if it is not `DEFAULT`).
 AgentCore checks both resources.
 
-With the `ec2_herdr_host` stack, set `AGENTCORE_RUNTIME_ARN` in its `.env` to the `RuntimeArn` and redeploy. The stack then adds exactly this policy.
-Without it, the role allows only the Claude model, and the connection fails with an HTTP 403 (`AccessDenied`).
+The `ec2_herdr_host` stack already grants them, on every runtime in its account and Region.
+To narrow that to one runtime, set `AGENTCORE_RUNTIME_ARN` in its `.env` to the `RuntimeArn` and redeploy.
+If a host was created before this default, redeploy the stack to add the policy. Until then the connection fails with an HTTP 403 (`AccessDenied`).
 
 ### 3. Open the host and start Herdr
 
