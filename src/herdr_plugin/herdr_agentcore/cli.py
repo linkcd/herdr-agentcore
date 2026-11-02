@@ -93,6 +93,11 @@ def choose(items: list, label, prompt: str):
         print("Enter a listed number or q.")
 
 
+# Offered only by interactive setup, for the sample runtime images.
+# The saved profile always holds the argv.
+SETUP_DEFAULT_COMMAND = '["/app/run.sh"]'
+
+
 def setup_menu(store: Store):
     print("Configure an existing AgentCore runtime. AWS credentials use your normal AWS chain.")
     name = input("Profile name [default]: ").strip() or "default"
@@ -100,9 +105,8 @@ def setup_menu(store: Store):
     aws_profile = input("AWS profile (blank for default credential chain): ").strip() or None
     endpoint = input("Runtime endpoint [DEFAULT]: ").strip() or "DEFAULT"
     kind = input("Herdr agent kind (blank for an ordinary terminal): ").strip() or None
-    command = input("Launch argv as JSON (required): ").strip()
-    if not command:
-        raise UserError("Supply explicit launch argv. The connector has no default command.")
+    answer = input(f"Launch argv as JSON [{SETUP_DEFAULT_COMMAND}]: ").strip()
+    command = answer or SETUP_DEFAULT_COMMAND
     profile = Profile.from_dict(
         {
             "runtime_arn": arn,

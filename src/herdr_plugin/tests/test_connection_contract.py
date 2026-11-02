@@ -6,7 +6,7 @@ from unittest.mock import Mock
 import pytest
 from conftest import ARN
 from herdr_agentcore.cli import exec_attach, main, setup_menu
-from herdr_agentcore.contract import ConnectionSpec, UserError, encode_descriptor
+from herdr_agentcore.contract import ConnectionSpec, encode_descriptor
 from herdr_agentcore.storage import Profile
 
 
@@ -180,12 +180,18 @@ def test_missing_command_does_not_replace_profile_or_infer_from_agent_kind(store
     assert path.read_bytes() == before
 
 
-def test_setup_requires_explicit_command_even_for_opencode(monkeypatch, store):
-    responses = iter(["new", ARN, "", "", "opencode", ""])
+def test_setup_offers_the_sample_launcher_when_the_command_is_blank(monkeypatch, store):
+    responses = iter(["new", ARN, "", "", "opencode", "", ""])
     monkeypatch.setattr("builtins.input", lambda _: next(responses))
-    with pytest.raises(UserError, match="explicit launch argv"):
-        setup_menu(store)
-    assert "new" not in store.profiles()
+    setup_menu(store)
+    assert store.profiles()["new"].command == ["/app/run.sh"]
+
+
+def test_setup_keeps_an_explicit_command(monkeypatch, store):
+    responses = iter(["new", ARN, "", "", "opencode", '["/opt/agent", "--tui"]', ""])
+    monkeypatch.setattr("builtins.input", lambda _: next(responses))
+    setup_menu(store)
+    assert store.profiles()["new"].command == ["/opt/agent", "--tui"]
 
 
 def test_connector_command_override_is_saved_in_the_session_snapshot(tmp_path, store):

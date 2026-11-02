@@ -24,7 +24,7 @@ Runtime images, CDK infrastructure, provision profiles, storage, and runtime ver
 ## Preserve connector behavior
 
 - Use only public Herdr CLI, plugin, and socket APIs. Do not modify Herdr core.
-- A launch command is explicit and has no inferred default. Record the launch attempt before sending it. Never replay uncertain commands or user input.
+- A launch command is explicit and has no inferred default. Only the interactive setup prompt shows `["/app/run.sh"]` as a visible default that the user confirms; the saved profile always holds the argv. Record the launch attempt before sending it. Never replay uncertain commands or user input.
 - Reattach only to the recorded runtime-session and shell IDs. Require the original PTY after a launch attempt.
 - Detach closes the WebSocket without a shell-shutdown frame. Stop requires explicit confirmation and targets the whole runtime session.
 - The saved `stopped` label means AWS accepted the request, not that a completion waiter verified termination.

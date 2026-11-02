@@ -57,7 +57,7 @@ An **AgentCore setup** pane opens and asks these questions:
 | AWS profile | Leave blank. The host uses its instance role. |
 | Runtime endpoint | Leave blank to use `DEFAULT`. |
 | Herdr agent kind | `opencode` or `codex`, to match the runtime image. Leave blank for a plain terminal. |
-| Launch argv as JSON | The launch command from step 1, for example `["/app/run.sh"]`. |
+| Launch argv as JSON | Press Enter to accept the default `["/app/run.sh"]`, which the sample OpenCode and Codex images use. For another image, enter the `command` from its `ConnectionDescriptor`. |
 
 The answers are saved as a profile in `config.json` in the folder printed by `herdr plugin config-dir agentcore`.
 The region comes from the ARN. The first profile you save becomes the default.
@@ -123,7 +123,7 @@ herdr plugin action invoke agentcore.new
 ```
 
 Run the actions from a Herdr workspace. Setup asks for the runtime ARN, launch argv, and optional local settings.
-Supply argv as JSON, for example `["/app/run.sh"]` when that is the runtime's declared launcher.
+Supply argv as JSON. Interactive setup offers `["/app/run.sh"]`, the sample images' launcher, when you press Enter.
 Herdr previews the manifest and build commands before an interactive install.
 Use `--ref TAG_OR_COMMIT` to select a published revision and `--yes` for a trusted noninteractive install.
 Plugins run with the host user's permissions and AWS credential access.
